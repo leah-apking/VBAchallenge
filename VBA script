@@ -1,0 +1,142 @@
+Sub summary()
+
+For Each ws In Worksheets
+
+Dim ticker As String
+Dim total As Double
+Dim row As Integer
+Dim lastRow As Long
+
+Dim opening As Double
+Dim closing As Double
+Dim percent As Double
+Dim change As Double
+
+total = 0
+row = 1
+opening = ws.Cells(2, 3).Value
+
+lastRow = ws.Cells(Rows.Count, 1).End(xlUp).row
+
+
+For i = 2 To lastRow
+
+If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+    row = row + 1
+
+'Ticker value
+    ticker = ws.Cells(i, 1).Value
+        ws.Cells(row, "I").Value = ticker
+     
+'Total value
+    total = total + ws.Cells(i, 7).Value
+        ws.Range("L" & row).Value = total
+        
+ 'Yearly change value
+    closing = ws.Cells(i, 6).Value
+    change = closing - opening
+        ws.Cells(row, "J").Value = change
+ 'Yearly Change conditional formatting
+    If ws.Cells(row, "J").Value > 0 Then
+        ws.Cells(row, "J").Interior.ColorIndex = 4
+    End If
+    If ws.Cells(row, "J").Value < 0 Then
+        ws.Cells(row, "J").Interior.ColorIndex = 3
+    End If
+    If ws.Cells(row, "J").Value = 0 Then
+        ws.Cells(row, "J").Interior.ColorIndex = 6
+    End If
+
+'Pecent changed value
+    percent = change / opening
+        ws.Cells(row, "K").Value = percent
+        ws.Cells(row, 11).NumberFormat = "0.00%"
+
+'Reset variables
+    total = 0
+    closing = 0
+    change = 0
+    percent = 0
+    opening = ws.Cells(i + 1, 3).Value
+    
+  Else
+    total = total + ws.Cells(i, 7).Value
+End If
+Next i
+
+'Headers
+ws.Cells(1, 12).Value = "Total Stock Volume"
+ws.Cells(1, 11).Value = "Percent Change"
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Yearly Change"
+
+'Titles for Greatest Chart
+ws.Cells(1, 15).Value = "Ticker"
+ws.Cells(1, 16).Value = "Value"
+ws.Cells(2, 14).Value = "Greatest % Increase"
+ws.Cells(3, 14).Value = "Greatest % Decrease"
+ws.Cells(4, 14).Value = "Greatest Total Volume"
+
+'Greatest Volume
+Dim last As Long
+last = ws.Cells(Rows.Count, 9).End(xlUp).row
+
+Dim gtotal As Double
+Dim gticker As String
+
+gtotal = 0
+
+For j = 2 To last
+
+If ws.Cells(j, 12).Value > gtotal Then
+
+    gtotal = ws.Cells(j, 12).Value
+    gticker = ws.Cells(j, 9).Value
+    
+    ws.Cells(4, 16) = gtotal
+    ws.Cells(4, 15) = gticker
+End If
+    Next j
+    
+'Greatest % Increase
+Dim gincrease As Double
+Dim iticker As String
+
+gincrease = 0
+
+For k = 2 To last
+
+If ws.Cells(k, 11).Value > gincrease Then
+
+    gincrease = ws.Cells(k, 11).Value
+    iticker = ws.Cells(k, 9).Value
+    
+    ws.Cells(2, 16) = gincrease
+    ws.Cells(2, 15) = iticker
+End If
+    Next k
+    
+'Greatest % Decrease
+Dim gdecrease As Double
+Dim dticker As String
+
+gdecrease = 0
+
+For m = 2 To last
+
+If ws.Cells(m, 11).Value < gdecrease Then
+
+    gdecrease = ws.Cells(m, 11).Value
+    dticker = ws.Cells(m, 9).Value
+    
+    ws.Cells(3, 16) = gdecrease
+    ws.Cells(3, 15) = dticker
+End If
+    Next m
+    
+ws.Cells(2, 16).NumberFormat = "0.00%"
+ws.Cells(3, 16).NumberFormat = "0.00%"
+
+Next ws
+
+End Sub
